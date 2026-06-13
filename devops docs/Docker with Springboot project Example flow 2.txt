@@ -1,0 +1,163 @@
+01. First create one spring boot application.
+	create one demo controller with @RequestMapping and add any port number in application.properties file [for eg: server.port=9000].
+	
+	-----------------------------------
+	
+	DemoController.java: 
+	
+	@RestController
+	public class DemoController {	
+		@RequestMapping("/")
+		public String demo() {
+			return "Welcome to Spring boot Demo project";
+		}
+	}
+
+	--------------------------------------
+	
+	In application.properties file add below code:
+	--------------------------------------
+	server.port=9000
+	--------------------------------------
+
+
+	Import above spring boot sproject to STS or eclipse.
+	
+02. Run maven build in STS / eclipse / IntelliJ.
+	STS		 --> Runas --> maven build --> clean install
+	intelliJ --> mvn clean install
+
+03. Go to project root folder and create a file names as "Dockerfile".
+	file conetent will be like below. 
+	Make sure file name is exactly "Dockerfile".
+	
+	Dockerfile
+	----------------------------------
+	FROM openjdk:21
+	LABEL maintainer ="kamal"
+	ADD target/demo-all-0.0.1-SNAPSHOT.jar demo-all-0.0.1-SNAPSHOT.jar
+	ENTRYPOINT ["java","-jar","demo-all-0.0.1-SNAPSHOT.jar"]
+	----------------------------------
+	OR
+	----------------------------------
+	# $ D:\practice\java\STS\springboot\demo-1>docker build -t test-app:1.0 .
+	# $ D:\practice\java\STS\springboot\demo-1>docker run -d --name test-cntr-1 -p 9001:9001 test-app:1.0
+	# $ D:\practice\java\STS\springboot\demo-1>docker exec -it test-cntr-1 /bin/bash
+	
+	FROM eclipse-temurin:21-jdk
+	LABEL maintainer ="kamal"
+	WORKDIR /myapp-dir
+	COPY ./target/demo-all-0.0.1-SNAPSHOT.jar demo-all-0.0.1-SNAPSHOT.jar
+	EXPOSE 9000
+	CMD [ "java", "-jar", "demo-all-0.0.1-SNAPSHOT.jar" ]
+	----------------------------------
+	.jar file name we can find in your target folder of your project folder.
+	Please run maven build then only you can see jar file name in target folder.
+	
+04. Make sure you installed jdk 21 in your system or change above Dockerfile file version  
+    accordingly.
+	
+
+05. Now create a docker image.
+	
+	Open command prompt(CLI) at Dockerfile location folder. Run below command.
+	
+	Syntax: 
+	$ docker build -t <imageName_YourChoice> .   ==> at the end SPACE DOT (.) is important. 
+	$ docker build -t <imageName_YourChoice>:1.0 .   ==> at the end SPACE DOT (.) is important. 
+	
+	Example:
+	$ docker build -t demo-project .  ==> docker image will be created with ":latest" version/tag.
+	
+	With above command docker image will be created. 
+	
+	IMPORTANT: At the end of above command space dot (.) is important.
+	
+	Now we can check created docker image.
+	
+	$ docker images
+	
+06. Now run docker image to create a docker container.
+
+	Syntax: 
+	$ docker run --name <containerName_YourChoice> -p <anyNewportNumber_YourChoice>:<springbootGivenPortNumber> <imageName>
+	
+	Example:
+	$ docker run --name demo -p 9001:9000 demo-project
+	
+07. Access spring boot application in browser.
+		Syntax: 
+		http://IpAddress:above_given_anyNewportNumber_YourChoice/
+		
+		Example: 
+		http://localhost:9001/
+	
+08. How to stop and remove all containers from docker?  
+
+	$ docker container ls -a      ==> To see all running and stopped containers list.
+	$ docker stop $(docker ps -q)  ==> To stop all running containers.
+	$ docker container ls -a
+	$ docker system prune          ==> To remove all stopped containers.
+
+09. How to remove all images from docker? 
+ 
+	$ docker images            ==> To see list of docker images.
+	$ docker image prune -a    ==> To remove all images from system.
+
+10. How to connect to runnig container from another CLI?
+	$ docker container ls     ==> Gives running containers name, ids etc.
+	
+	$ docker exec -it <container-name / ID> bash
+		Eg : $ docker exec -it 12a71abd6c96 bash
+		
+11. Exit Docker Container without Stopping It? 
+			press Ctrl+P followed by Ctrl+Q
+			
+			==> This operation detaches the container and allows you to return to your system's shell.
+12. 		
+-------------------------------------------------------------
+docker-compose.yml:
+-------------
+version: '3.8'
+
+services:
+  test123:
+    image: openjdk:17
+    container_name: myapp-container123
+    working_dir: /myapp-dir1
+    volumes:
+      - ./target/test-0.0.1-SNAPSHOT.jar:/myapp-dir1/test-0.0.1-SNAPSHOT.jar
+    ports:
+      - "9000:9000"
+    command: ["java", "-jar", "test-0.0.1-SNAPSHOT.jar"]
+-------------
+ --> Go to file location run below command:
+	$ dockre compose up
+------------------------------------------------------------	
+
+
+Pushing docker image to docker hub. Run below commands.
+$ docker login
+	Username:
+	Password:
+		Please do the authentication accordingly. Process may change sometimes.
+
+Please start your docker desktop.
+
+Tag Your Image Properly: 
+	Now open CMD/GITBASH and 
+
+	Docker Hub requires this format:
+		<dockerhub-username>/<image-name>:<tag>
+		$ docker images
+		$ docker tag sb-demo kamaltechlearn/sb-demo:latest
+		$ docker images   ==> you can see you image like userName/imageName
+		
+		PUSH: 
+		$ docker push kamaltechlearn/sb-demo:latest
+		
+		Now go to your https://hub.docker.com/repositories/kamaltechlearn  check you can see your docker image there.
+		
+		
+
+
